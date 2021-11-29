@@ -1,3 +1,5 @@
+package chap05_Semaphore;
+
 import java.util.concurrent.Semaphore;
 
 public class SomeResource {

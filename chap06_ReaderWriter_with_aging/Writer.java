@@ -1,4 +1,4 @@
-package monitor_use_aging;
+package chap06_monitor_use_aging;
 
 public class Writer extends Thread{
 	private ReadWrite m; 	

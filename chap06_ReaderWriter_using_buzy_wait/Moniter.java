@@ -1,7 +1,5 @@
-package chap06_project;
+package chap06_project_monitor_use_busy_wating;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 public class Moniter{

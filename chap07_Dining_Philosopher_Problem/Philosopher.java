@@ -1,4 +1,4 @@
-package Philosopher;
+package chap07_Dining_Philosopher_Problem;
 
 import java.util.ArrayList;
 import java.util.List;

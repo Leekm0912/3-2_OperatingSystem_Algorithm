@@ -1,4 +1,4 @@
-package chap06_project;
+package chap06_project_monitor_use_busy_wating;
 
 public class Reader extends Thread{
 	private Moniter m;		// 스레드 간 공유 객체 ReadWriteBuffer

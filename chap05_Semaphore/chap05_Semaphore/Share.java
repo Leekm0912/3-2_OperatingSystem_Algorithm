@@ -1,3 +1,4 @@
+package chap05_Semaphore;
 
 public class Share {
 	public int end;

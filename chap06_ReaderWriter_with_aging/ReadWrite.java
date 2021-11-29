@@ -1,4 +1,4 @@
-package monitor_use_aging;
+package chap06_monitor_use_aging;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
