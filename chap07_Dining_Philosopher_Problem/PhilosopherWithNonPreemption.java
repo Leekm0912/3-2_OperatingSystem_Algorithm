@@ -49,6 +49,7 @@ public class PhilosopherWithNonPreemption extends Thread{
                     this.lStickUsing[this.lStickNum] = false;
                     continue;
                 }
+                // 아니면 그냥 집어서 먹으면 됨.
                 else{
                     rStick.acquire(); // 오른손 집음
                     this.rStickUsing[this.rStickNum] = true;
