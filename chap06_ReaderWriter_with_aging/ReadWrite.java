@@ -1,4 +1,4 @@
-package chap06_monitor_use_aging;
+package chap06_ReaderWriter_with_aging;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;

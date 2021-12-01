@@ -1,4 +1,4 @@
-package chap05_project.bakery;
+package chap05_bakery;
 
 public class Bakery extends Thread {
 	private Share share; // 공유 객체 필드

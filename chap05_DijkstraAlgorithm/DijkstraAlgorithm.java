@@ -1,4 +1,4 @@
-package chap05_project.timecheck;
+package chap05_DijkstraAlgorithm;
 
 
 public class DijkstraAlgorithm extends Thread {

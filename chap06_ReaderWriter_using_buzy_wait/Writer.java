@@ -1,4 +1,4 @@
-package chap06_project_monitor_use_busy_wating;
+package chap06_ReaderWriter_using_buzy_wait;
 
 public class Writer extends Thread{
 	private Moniter m; 	// 스레드 간 공유 객체 ReadWriteBuffer

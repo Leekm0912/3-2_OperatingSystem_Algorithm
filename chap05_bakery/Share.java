@@ -1,4 +1,4 @@
-package chap05_project.bakery;
+package chap05_bakery;
 
 // Shared.java : 스레드간의 공유 객체로 사용.
 public class Share {
