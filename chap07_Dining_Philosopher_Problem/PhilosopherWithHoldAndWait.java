@@ -1,3 +1,4 @@
+package chap07_Dining_Philosopher_Problem;
 
 import java.util.concurrent.Semaphore;
 
