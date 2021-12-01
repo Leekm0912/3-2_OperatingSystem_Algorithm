@@ -49,8 +49,10 @@ public class PhilosopherWithNonPreemption extends Thread{
                     this.lStickUsing[this.lStickNum] = false;
                     continue;
                 }
-                rStick.acquire(); // 오른손 집음
-                this.rStickUsing[this.rStickNum] = true;
+                else{
+                    rStick.acquire(); // 오른손 집음
+                    this.rStickUsing[this.rStickNum] = true;
+                }
                 eat();
                 rStick.release();
                 lStick.release();
