@@ -6,10 +6,8 @@ import java.util.concurrent.Semaphore;
 
 public class PhilosopherWithNonPreemptionSecond extends Thread{
     int id;
-    Semaphore lStick;
-    int lStickNum;
-    Semaphore rStick;
-    int rStickNum;
+    Semaphore lStick, rStick;
+    int lStickNum, rStickNum;
     boolean[] lock;
 
     public PhilosopherWithNonPreemptionSecond(int id, int len, List<Semaphore> stick) {
@@ -25,10 +23,9 @@ public class PhilosopherWithNonPreemptionSecond extends Thread{
     public void run() {
         try {
             while (true) {
-                lStick.acquire(); // 왼손 집음
-                // 오른손을 집어야 하는데, 누가 쓰고있고, 잠겨있지 않은 경우라면 뺏어버림.
-                if(!this.rStick.tryAcquire()) { 
-                // 오른쪽 젓가락이 사용중이면 false, 사용중이지 않으면 acquire하면서 true를 리턴
+                lStick.acquire();
+                // 오른손을 집어야 하는데, 누가 가지고 있지만 사용 중이지 않은 경우라면 뺏어버림.
+                if(!this.rStick.tryAcquire()) {
                 	if(!this.lock[this.rStickNum]) {
                 		this.rStick.release();
                     	this.rStick.acquire();
@@ -52,17 +49,13 @@ public class PhilosopherWithNonPreemptionSecond extends Thread{
         try {
 			sleep(1000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
     }
 
     private void eat() {
         this.lock[this.id] = true;
         System.out.println("eat : "+ this.id);
-//        sleep(1000);
         this.lock[this.id] = false;
-//        sleep(1000);
     }
 
     public static void main(String[] args) {
@@ -71,7 +64,6 @@ public class PhilosopherWithNonPreemptionSecond extends Thread{
         for(int i=0; i<n; i++){
             stick.add(new Semaphore(1));
         }
-//        Semaphore ls = new Semaphore(1);
         PhilosopherWithNonPreemptionSecond[] p = new PhilosopherWithNonPreemptionSecond[n];
         
         for(int i =0; i<n; i++){

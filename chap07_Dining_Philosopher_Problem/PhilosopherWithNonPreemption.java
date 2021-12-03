@@ -1,7 +1,6 @@
 package chap07_Dining_Philosopher_Problem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 

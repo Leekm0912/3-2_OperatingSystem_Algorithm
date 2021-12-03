@@ -3,37 +3,35 @@ package chap07_Dining_Philosopher_Problem;
 import java.util.concurrent.Semaphore;
 
 class PhilosopherWithHoldAndWait extends Thread {
-    int id; // 철학자 id
-    Semaphore lstick, rstick; // 왼쪽, 오른쪽 젓가락
+    int id;
+    Semaphore lstick, rstick;
+
     PhilosopherWithHoldAndWait(int id, Semaphore lstick, Semaphore rstick) {
        this.id = id;
        this.lstick = lstick;
        this.rstick = rstick;
-   }
+    }
     public void run() {
    		while(true) {
    			try {
-				lstick.acquire(); // 왼쪽 집어들기
+				lstick.acquire();
 				if(!rstick.tryAcquire()){
-					lstick.release();// 오른쪽을 사용할 수 없으면 왼쪽 내려놓기
+					lstick.release();
 				}else {
-					eat(); // 식사
-					rstick.release(); // 오른쪽 내려놓기
-					lstick.release(); // 왼쪽 내려놓기
-					think(); // 생각하기
+					eat();
+					rstick.release();
+					lstick.release();
+					think();
 				}
 			} catch (InterruptedException e) {
 			} 
    		}
-        
     }
     private void think() {
         System.out.println("think : "+ this.id);
         try {
 			sleep(1000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
     }
     private void eat() {
