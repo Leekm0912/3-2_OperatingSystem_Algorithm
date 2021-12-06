@@ -19,8 +19,8 @@ public class DeadLock extends Thread {
 
 	@Override
 	public void run() {
-		int rand = r.nextInt(5) + 1; // ¸î°³ÀÇ ÀÚ¿øÀ» »ç¿ëÇÒÁö. 1~5°³ÀÇ ÀÚ¿øÀ» »ç¿ëÇÔ.
-		// °í¸¥ ÀÚ¿øÀ» save¿¡ Ãß°¡
+		int rand = r.nextInt(5) + 1; // ëª‡ê°œì˜ ìì›ì„ ì‚¬ìš©í• ì§€. 1~5ê°œì˜ ìì›ì„ ì‚¬ìš©í•¨.
+		// ê³ ë¥¸ ìì›ì„ saveì— ì¶”ê°€
 		while (save.size() < rand) {
 			int temp = r.nextInt(this.numOfResource);
 			if (!save.containsKey(temp)) {
@@ -41,7 +41,7 @@ public class DeadLock extends Thread {
 					});
 				}
 				work(save.keySet());
-				// ÀÛ¾÷ ÈÄ ÃÊ±âÈ­
+				// ì‘ì—… í›„ ì´ˆê¸°í™”
 				for (Semaphore s : this.save.values()) {
 					s.release();
 				}
