@@ -6,24 +6,38 @@ import java.util.concurrent.Semaphore;
 public class DeadLockPreventionUsingNonPreemption extends Thread {
 	private int id;
 	private int numOfResource;
+	private int maxResource;
 	private int require = 0;
 	private Random random = new Random();
 	private List<Semaphore> resource;
 	private Map<Integer, Semaphore> save = new HashMap<>();
 	private boolean[] lock;
+	public boolean end = false;
+	private int loop = -1;
 
-	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource) {
+	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource, int maxResource) {
 		this.id = id;
 		this.resource = resource;
 		this.numOfResource = numOfResource;
 		this.lock = new boolean[numOfResource];
+		this.maxResource = maxResource;
+	}
+	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource, int maxResource, int loopCount) {
+		this(id, numOfResource, resource, maxResource);
+		this.loop = loopCount;
 	}
 
 	@Override
 	public void run() {
-		while (true) {
+		// loop가 -1이 아니면 무한반복 안하도록 설정.
+		int loopCount = 0;
+		if(loop != -1) {
+			loopCount = loop;
+		}
+		while (loopCount > 0 || this.loop == -1) {
 			// System.out.println("start "+ id);
-			int rand = random.nextInt(5) + 1; // 몇개의 자원을 사용할지. 1~5개의 자원을 사용함.
+			// 스레드가 몇개의 자원을 필요로 할지. 1 ~ maxResource 사이의 값이 랜덤으로 사용됨.
+			int rand = random.nextInt(this.maxResource) + 1;
 			// 고른 자원을 save에 추가
 			while (this.save.size() < rand) {
 				int temp = random.nextInt(this.numOfResource);
@@ -68,6 +82,7 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 				}
 				this.save = new HashMap<Integer, Semaphore>();
 				this.require = 0;
+				loopCount--;
 				// System.out.println("초기화 완료 " + id);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -87,8 +102,9 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 	}
 
 	public static void main(String[] args) {
-		int numOfResource = 10;
-		int numOfThread = 10;
+		int numOfResource = 20;
+		int numOfThread = 15;
+		int maxResource = 5;
 		
 		List<Semaphore> resource = new ArrayList<>();
 		for (int i = 0; i < numOfResource; i++) {
@@ -96,7 +112,9 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 		}
 
 		for (int i = 0; i < numOfThread; i++) {
-			DeadLockPreventionUsingNonPreemption p = new DeadLockPreventionUsingNonPreemption(i, numOfResource, resource);
+			DeadLockPreventionUsingNonPreemption p = new DeadLockPreventionUsingNonPreemption(
+					i, numOfResource, resource, maxResource
+			);
 			p.start();
 		}
 	}
