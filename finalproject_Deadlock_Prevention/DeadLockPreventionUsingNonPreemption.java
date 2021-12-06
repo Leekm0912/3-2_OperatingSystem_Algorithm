@@ -23,8 +23,8 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 	public void run() {
 		while(true) {
 			// System.out.println("start "+ id);
-			int rand = r.nextInt(5) + 1; // ¸î°³ÀÇ ÀÚ¿øÀ» »ç¿ëÇÒÁö. 1~5°³ÀÇ ÀÚ¿øÀ» »ç¿ëÇÔ.
-			// °í¸¥ ÀÚ¿øÀ» save¿¡ Ãß°¡
+			int rand = r.nextInt(5) + 1; // ëª‡ê°œì˜ ìì›ì„ ì‚¬ìš©í• ì§€. 1~5ê°œì˜ ìì›ì„ ì‚¬ìš©í•¨.
+			// ê³ ë¥¸ ìì›ì„ saveì— ì¶”ê°€
 			while (save.size() < rand) {
 				int temp = r.nextInt(this.numOfResource);
 				if (!save.containsKey(temp)) {
@@ -39,7 +39,7 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 						if (v.tryAcquire()) {
 							require++;
 						} else {
-							// Àá°ÜÀÖÁö ¾ÊÀ¸¸é »¯¾î¿È
+							// ì ê²¨ìˆì§€ ì•Šìœ¼ë©´ ëºì–´ì˜´
 							if (!lock[k]) {
 								try {
 									v.release();
@@ -48,7 +48,7 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 								} catch (Exception e) {
 								}
 							}
-							// Àá°ÜÀÖÀ¸¸é È®º¸Çß´ø ÀÚ¿øµéÀ» ³õ°í ±â´Ù¸².
+							// ì ê²¨ìˆìœ¼ë©´ í™•ë³´í–ˆë˜ ìì›ë“¤ì„ ë†“ê³  ì²˜ìŒìœ¼ë¡œ ëŒì•„ê°.
 							else {
 								save.forEach((kk, vv) -> {
 									vv.release();
@@ -62,13 +62,13 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 					// System.out.println(require);
 				}
 				work(save.keySet());
-				// ÀÛ¾÷ ÈÄ ÃÊ±âÈ­
+				// ì‘ì—… í›„ ì´ˆê¸°í™”
 				for (Semaphore s : this.save.values()) {
 					s.release();
 				}
 				this.save = new HashMap<Integer, Semaphore>();
 				this.require = 0;
-				// System.out.println("ÃÊ±âÈ­ ¿Ï·á " + id);
+				// System.out.println("ì´ˆê¸°í™” ì™„ë£Œ " + id);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
