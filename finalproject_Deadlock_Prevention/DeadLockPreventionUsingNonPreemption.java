@@ -1,6 +1,12 @@
 package finalproject_Deadlock_Prevention;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 public class DeadLockPreventionUsingNonPreemption extends Thread {
@@ -12,18 +18,20 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 	private List<Semaphore> resource;
 	private Map<Integer, Semaphore> save = new HashMap<>();
 	private boolean[] lock;
-	public boolean end = false;
 	private int loop = -1;
+	public boolean end = false;
+	private int sleepTime = 0;
 
-	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource, int maxResource) {
+	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource, int maxResource, int sleepTime) {
 		this.id = id;
 		this.resource = resource;
 		this.numOfResource = numOfResource;
 		this.lock = new boolean[numOfResource];
 		this.maxResource = maxResource;
+		this.sleepTime = sleepTime;
 	}
-	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource, int maxResource, int loopCount) {
-		this(id, numOfResource, resource, maxResource);
+	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource, int maxResource, int sleepTime, int loopCount) {
+		this(id, numOfResource, resource, maxResource, sleepTime);
 		this.loop = loopCount;
 	}
 
@@ -88,6 +96,7 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 				e.printStackTrace();
 			}
 		}
+		this.end = true;
 	}
 
 	private void work(Set<Integer> need) throws InterruptedException {
@@ -95,27 +104,57 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 		this.save.forEach((k, v) -> {
 			this.lock[k] = true;
 		});
-		sleep(1000);
+		sleep(this.sleepTime);
 		this.save.forEach((k, v) -> {
 			this.lock[k] = false;
 		});
 	}
 
 	public static void main(String[] args) {
+		// 리소스의 개수
 		int numOfResource = 20;
+		// 스레드의 개수
 		int numOfThread = 15;
+		// 스레드가 필요로 하는 최대 리소스 개수
 		int maxResource = 5;
+		// 반복 횟수. -1이면 무한반복
+		int loop = -1;
+		// work의 sleep 시간
+		int sleepTime = 1000;
 		
 		List<Semaphore> resource = new ArrayList<>();
 		for (int i = 0; i < numOfResource; i++) {
 			resource.add(new Semaphore(1));
 		}
-
+		
+		long beforeTime = System.currentTimeMillis(); // 시작시간 측정
+		List<DeadLockPreventionUsingNonPreemption> saveThread = new ArrayList<DeadLockPreventionUsingNonPreemption>();
 		for (int i = 0; i < numOfThread; i++) {
 			DeadLockPreventionUsingNonPreemption p = new DeadLockPreventionUsingNonPreemption(
-					i, numOfResource, resource, maxResource
+					i, // Thread id
+					numOfResource,
+					resource, 
+					maxResource, 
+					sleepTime, 
+					loop 
 			);
 			p.start();
+			saveThread.add(p);
 		}
+		
+		while(true) {
+			boolean threadEnd = true;
+			for(int i = 0; i < saveThread.size(); i++) {
+				DeadLockPreventionUsingNonPreemption temp = saveThread.get(i);
+				if(temp.end == false) {
+					threadEnd = false;
+				}
+			}
+			if(threadEnd) {
+				break;
+			}
+		}
+		long afterTime = System.currentTimeMillis(); // 코드 실행 후의 시간 측정
+	    System.err.println(" 소요시간(ms) : " + (afterTime - beforeTime));
 	}
 }
