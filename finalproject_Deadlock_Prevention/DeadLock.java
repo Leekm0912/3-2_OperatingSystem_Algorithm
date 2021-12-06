@@ -19,23 +19,23 @@ public class DeadLock extends Thread {
 
 	@Override
 	public void run() {
-		int rand = r.nextInt(5) + 1; // 몇개의 자원을 사용할지. 1~5개의 자원을 사용함.
-		// 고른 자원을 save에 추가
-		while (save.size() < rand) {
-			int temp = r.nextInt(this.numOfResource);
-			if (!save.containsKey(temp)) {
-				save.put(temp, this.resource.get(temp));
+		while(true) {
+			int rand = r.nextInt(5) + 1; // 몇개의 자원을 사용할지. 1~5개의 자원을 사용함.
+			// 고른 자원을 save에 추가
+			while (save.size() < rand) {
+				int temp = r.nextInt(this.numOfResource);
+				if (!save.containsKey(temp)) {
+					save.put(temp, this.resource.get(temp));
+				}
 			}
-		}
-		System.out.println("id " + this.id + " need : " + Arrays.toString(save.keySet().toArray()));
+			System.out.println("id " + this.id + " need : " + Arrays.toString(save.keySet().toArray()));
 
-		try {
-			while (true) {
+			try {
 				while (require < rand) {
 					this.save.forEach((k, v) -> {
 						if (v.tryAcquire()) {
 							require++;
-						}else {
+						} else {
 							// System.out.println(Thread.currentThread() + " " + k + " fail");
 						}
 					});
@@ -47,9 +47,9 @@ public class DeadLock extends Thread {
 				}
 				this.save = new HashMap<Integer, Semaphore>();
 				require = 0;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 	}
 
