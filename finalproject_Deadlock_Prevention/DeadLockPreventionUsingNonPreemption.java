@@ -3,7 +3,7 @@ package finalproject_Deadlock_Prevention;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
-public class DeadLockUsingNonPreemption extends Thread {
+public class DeadLockPreventionUsingNonPreemption extends Thread {
 	int id;
 	Random r = new Random();
 	int require;
@@ -12,7 +12,7 @@ public class DeadLockUsingNonPreemption extends Thread {
 	int numOfResource;
 	boolean[] lock;
 
-	public DeadLockUsingNonPreemption(int id, int n, List<Semaphore> resource) {
+	public DeadLockPreventionUsingNonPreemption(int id, int n, List<Semaphore> resource) {
 		this.id = id;
 		this.resource = resource;
 		this.numOfResource = n;
@@ -23,8 +23,8 @@ public class DeadLockUsingNonPreemption extends Thread {
 	public void run() {
 		while(true) {
 			// System.out.println("start "+ id);
-			int rand = r.nextInt(5) + 1; // ëª‡ê°œì˜ ìì›ì„ ì‚¬ìš©í• ì§€. 1~5ê°œì˜ ìì›ì„ ì‚¬ìš©í•¨.
-			// ê³ ë¥¸ ìì›ì„ saveì— ì¶”ê°€
+			int rand = r.nextInt(5) + 1; // ¸î°³ÀÇ ÀÚ¿øÀ» »ç¿ëÇÒÁö. 1~5°³ÀÇ ÀÚ¿øÀ» »ç¿ëÇÔ.
+			// °í¸¥ ÀÚ¿øÀ» save¿¡ Ãß°¡
 			while (save.size() < rand) {
 				int temp = r.nextInt(this.numOfResource);
 				if (!save.containsKey(temp)) {
@@ -39,7 +39,7 @@ public class DeadLockUsingNonPreemption extends Thread {
 						if (v.tryAcquire()) {
 							require++;
 						} else {
-							// ì ê²¨ìˆì§€ ì•Šìœ¼ë©´ ëºì–´ì˜´
+							// Àá°ÜÀÖÁö ¾ÊÀ¸¸é »¯¾î¿È
 							if (!lock[k]) {
 								try {
 									v.release();
@@ -48,7 +48,7 @@ public class DeadLockUsingNonPreemption extends Thread {
 								} catch (Exception e) {
 								}
 							}
-							// ì ê²¨ìˆìœ¼ë©´ í™•ë³´í–ˆë˜ ìì›ë“¤ì„ ë†“ê³  ê¸°ë‹¤ë¦¼.
+							// Àá°ÜÀÖÀ¸¸é È®º¸Çß´ø ÀÚ¿øµéÀ» ³õ°í ±â´Ù¸².
 							else {
 								save.forEach((kk, vv) -> {
 									vv.release();
@@ -62,13 +62,13 @@ public class DeadLockUsingNonPreemption extends Thread {
 					// System.out.println(require);
 				}
 				work(save.keySet());
-				// ì‘ì—… í›„ ì´ˆê¸°í™”
+				// ÀÛ¾÷ ÈÄ ÃÊ±âÈ­
 				for (Semaphore s : this.save.values()) {
 					s.release();
 				}
 				this.save = new HashMap<Integer, Semaphore>();
 				this.require = 0;
-				// System.out.println("ì´ˆê¸°í™” ì™„ë£Œ " + id);
+				// System.out.println("ÃÊ±âÈ­ ¿Ï·á " + id);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -94,7 +94,7 @@ public class DeadLockUsingNonPreemption extends Thread {
 		}
 //        Semaphore ls = new Semaphore(1);
 		for (int i = 0; i < n; i++) {
-			DeadLockUsingNonPreemption p = new DeadLockUsingNonPreemption(i, n, resource);
+			DeadLockPreventionUsingNonPreemption p = new DeadLockPreventionUsingNonPreemption(i, n, resource);
 			p.start();
 		}
 	}
