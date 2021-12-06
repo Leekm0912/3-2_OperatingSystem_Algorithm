@@ -4,34 +4,34 @@ import java.util.*;
 import java.util.concurrent.Semaphore;
 
 public class DeadLockPreventionUsingNonPreemption extends Thread {
-	int id;
-	Random r = new Random();
-	int require;
-	List<Semaphore> resource;
-	Map<Integer, Semaphore> save = new HashMap<>();
-	int numOfResource;
-	boolean[] lock;
+	private int id;
+	private int numOfResource;
+	private int require = 0;
+	private Random random = new Random();
+	private List<Semaphore> resource;
+	private Map<Integer, Semaphore> save = new HashMap<>();
+	private boolean[] lock;
 
-	public DeadLockPreventionUsingNonPreemption(int id, int n, List<Semaphore> resource) {
+	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource) {
 		this.id = id;
 		this.resource = resource;
-		this.numOfResource = n;
-		this.lock = new boolean[n];
+		this.numOfResource = numOfResource;
+		this.lock = new boolean[numOfResource];
 	}
 
 	@Override
 	public void run() {
-		while(true) {
+		while (true) {
 			// System.out.println("start "+ id);
-			int rand = r.nextInt(5) + 1; // ¸î°³ÀÇ ÀÚ¿øÀ» »ç¿ëÇÒÁö. 1~5°³ÀÇ ÀÚ¿øÀ» »ç¿ëÇÔ.
-			// °í¸¥ ÀÚ¿øÀ» save¿¡ Ãß°¡
-			while (save.size() < rand) {
-				int temp = r.nextInt(this.numOfResource);
-				if (!save.containsKey(temp)) {
-					save.put(temp, this.resource.get(temp));
+			int rand = random.nextInt(5) + 1; // ëª‡ê°œì˜ ìžì›ì„ ì‚¬ìš©í• ì§€. 1~5ê°œì˜ ìžì›ì„ ì‚¬ìš©í•¨.
+			// ê³ ë¥¸ ìžì›ì„ saveì— ì¶”ê°€
+			while (this.save.size() < rand) {
+				int temp = random.nextInt(this.numOfResource);
+				if (!this.save.containsKey(temp)) {
+					this.save.put(temp, this.resource.get(temp));
 				}
 			}
-			System.out.println("id " + this.id + " need : " + Arrays.toString(save.keySet().toArray()));
+			System.out.println("id " + this.id + " need : " + Arrays.toString(this.save.keySet().toArray()));
 
 			try {
 				while (require < rand) {
@@ -39,7 +39,7 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 						if (v.tryAcquire()) {
 							require++;
 						} else {
-							// Àá°ÜÀÖÁö ¾ÊÀ¸¸é »¯¾î¿È
+							// ìž ê²¨ìžˆì§€ ì•Šìœ¼ë©´ ëºì–´ì˜´
 							if (!lock[k]) {
 								try {
 									v.release();
@@ -48,7 +48,7 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 								} catch (Exception e) {
 								}
 							}
-							// Àá°ÜÀÖÀ¸¸é È®º¸Çß´ø ÀÚ¿øµéÀ» ³õ°í ±â´Ù¸².
+							// ìž ê²¨ìžˆìœ¼ë©´ í™•ë³´í–ˆë˜ ìžì›ë“¤ì„ ë†“ê³  ì²˜ìŒìœ¼ë¡œ ëŒì•„ê°.
 							else {
 								save.forEach((kk, vv) -> {
 									vv.release();
@@ -61,14 +61,14 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 					});
 					// System.out.println(require);
 				}
-				work(save.keySet());
-				// ÀÛ¾÷ ÈÄ ÃÊ±âÈ­
+				work(this.save.keySet());
+				// ìž‘ì—… í›„ ì´ˆê¸°í™”
 				for (Semaphore s : this.save.values()) {
 					s.release();
 				}
 				this.save = new HashMap<Integer, Semaphore>();
 				this.require = 0;
-				// System.out.println("ÃÊ±âÈ­ ¿Ï·á " + id);
+				// System.out.println("ì´ˆê¸°í™” ì™„ë£Œ " + id);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -77,24 +77,26 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 
 	private void work(Set<Integer> need) throws InterruptedException {
 		System.out.println("work : " + this.id + " need : " + Arrays.toString(need.toArray()));
-		this.save.forEach((k, v)->{
+		this.save.forEach((k, v) -> {
 			this.lock[k] = true;
 		});
 		sleep(1000);
-		this.save.forEach((k, v)->{
+		this.save.forEach((k, v) -> {
 			this.lock[k] = false;
 		});
 	}
 
 	public static void main(String[] args) {
-		int n = 10;
+		int numOfResource = 10;
+		int numOfThread = 10;
+		
 		List<Semaphore> resource = new ArrayList<>();
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < numOfResource; i++) {
 			resource.add(new Semaphore(1));
 		}
-//        Semaphore ls = new Semaphore(1);
-		for (int i = 0; i < n; i++) {
-			DeadLockPreventionUsingNonPreemption p = new DeadLockPreventionUsingNonPreemption(i, n, resource);
+
+		for (int i = 0; i < numOfThread; i++) {
+			DeadLockPreventionUsingNonPreemption p = new DeadLockPreventionUsingNonPreemption(i, numOfResource, resource);
 			p.start();
 		}
 	}
