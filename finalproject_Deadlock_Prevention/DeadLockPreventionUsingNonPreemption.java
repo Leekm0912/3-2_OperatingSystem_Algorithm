@@ -103,10 +103,10 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 	}
 
 	private void work(Set<Integer> need) throws InterruptedException {
-		System.out.println("work : " + this.id + " need : " + Arrays.toString(need.toArray()));
 		this.save.forEach((k, v) -> {
 			this.lock[k] = true;
 		});
+		System.out.println("work : " + this.id + " use : " + Arrays.toString(need.toArray()));
 		sleep(this.sleepTime);
 		this.save.forEach((k, v) -> {
 			this.lock[k] = false;
@@ -133,8 +133,10 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 		long beforeTime = System.currentTimeMillis(); // 시작시간 측정
 		List<DeadLockPreventionUsingNonPreemption> saveThread = new ArrayList<DeadLockPreventionUsingNonPreemption>();
 		for (int i = 0; i < numOfThread; i++) {
-			DeadLockPreventionUsingNonPreemption p = new DeadLockPreventionUsingNonPreemption(i, // Thread id
-					numOfResource, resource, maxResource, sleepTime, loop);
+			DeadLockPreventionUsingNonPreemption p = new DeadLockPreventionUsingNonPreemption(
+					i, // Thread id
+					numOfResource, resource, maxResource, sleepTime, loop
+			);
 			p.start();
 			saveThread.add(p);
 		}
