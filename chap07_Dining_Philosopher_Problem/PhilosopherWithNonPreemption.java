@@ -23,11 +23,6 @@ public class PhilosopherWithNonPreemption extends Thread{
         this.lStickUsing = new boolean[len];
         this.rStickUsing = new boolean[len];
         this.lock = new boolean[len];
-        try {
-            sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
