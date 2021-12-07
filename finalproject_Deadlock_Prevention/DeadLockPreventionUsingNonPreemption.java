@@ -22,7 +22,8 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 	public boolean end = false;
 	private int sleepTime = 0;
 
-	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource, int maxResource, int sleepTime) {
+	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource, int maxResource,
+			int sleepTime) {
 		this.id = id;
 		this.resource = resource;
 		this.numOfResource = numOfResource;
@@ -30,7 +31,9 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 		this.maxResource = maxResource;
 		this.sleepTime = sleepTime;
 	}
-	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource, int maxResource, int sleepTime, int loopCount) {
+
+	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource, int maxResource,
+			int sleepTime, int loopCount) {
 		this(id, numOfResource, resource, maxResource, sleepTime);
 		this.loop = loopCount;
 	}
@@ -39,7 +42,7 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 	public void run() {
 		// loop가 -1이 아니면 무한반복 안하도록 설정.
 		int loopCount = 0;
-		if(loop != -1) {
+		if (loop != -1) {
 			loopCount = loop;
 		}
 		while (loopCount > 0 || this.loop == -1) {
@@ -121,40 +124,34 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 		int loop = -1;
 		// work의 sleep 시간
 		int sleepTime = 1000;
-		
+
 		List<Semaphore> resource = new ArrayList<>();
 		for (int i = 0; i < numOfResource; i++) {
 			resource.add(new Semaphore(1));
 		}
-		
+
 		long beforeTime = System.currentTimeMillis(); // 시작시간 측정
 		List<DeadLockPreventionUsingNonPreemption> saveThread = new ArrayList<DeadLockPreventionUsingNonPreemption>();
 		for (int i = 0; i < numOfThread; i++) {
-			DeadLockPreventionUsingNonPreemption p = new DeadLockPreventionUsingNonPreemption(
-					i, // Thread id
-					numOfResource,
-					resource, 
-					maxResource, 
-					sleepTime, 
-					loop 
-			);
+			DeadLockPreventionUsingNonPreemption p = new DeadLockPreventionUsingNonPreemption(i, // Thread id
+					numOfResource, resource, maxResource, sleepTime, loop);
 			p.start();
 			saveThread.add(p);
 		}
-		
-		while(true) {
+
+		while (true) {
 			boolean threadEnd = true;
-			for(int i = 0; i < saveThread.size(); i++) {
+			for (int i = 0; i < saveThread.size(); i++) {
 				DeadLockPreventionUsingNonPreemption temp = saveThread.get(i);
-				if(temp.end == false) {
+				if (temp.end == false) {
 					threadEnd = false;
 				}
 			}
-			if(threadEnd) {
+			if (threadEnd) {
 				break;
 			}
 		}
 		long afterTime = System.currentTimeMillis(); // 코드 실행 후의 시간 측정
-	    System.err.println(" 소요시간(ms) : " + (afterTime - beforeTime));
+		System.err.println(" 소요시간(ms) : " + (afterTime - beforeTime));
 	}
 }
