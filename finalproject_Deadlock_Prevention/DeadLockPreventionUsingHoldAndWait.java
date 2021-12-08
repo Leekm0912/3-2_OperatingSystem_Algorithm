@@ -2,6 +2,7 @@ package finalproject_Deadlock_Prevention;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DeadLockPreventionUsingHoldAndWait extends Thread {
 	private int id;
@@ -14,6 +15,7 @@ public class DeadLockPreventionUsingHoldAndWait extends Thread {
 	private int loop = -1;
 	public boolean end = false;
 	private int sleepTime = 0;
+	static boolean[] usedResource;
 
 	public DeadLockPreventionUsingHoldAndWait(int id, int numOfResource, List<Semaphore> resource, int maxResource, int sleepTime) {
 		this.id = id;
@@ -24,19 +26,18 @@ public class DeadLockPreventionUsingHoldAndWait extends Thread {
 	}
 
 	public DeadLockPreventionUsingHoldAndWait(int id, int numOfResource, List<Semaphore> resource, int maxResource, int sleepTime,
-			int loopCount) {
+					int loopCount) {
 		this(id, numOfResource, resource, maxResource, sleepTime);
 		this.loop = loopCount;
 	}
 
 	@Override
-	public synchronized void run() {
+	public void run() {
 		// loop가 -1이 아니면 무한반복 안하도록 설정.
 		int loopCount = 0;
 		if (loop != -1) {
 			loopCount = loop;
 		}
-        
 		while (loopCount > 0 || this.loop == -1) {
 			try {
 				// 스레드가 몇개의 자원을 필요로 할지. 1 ~ maxResource 사이의 값이 랜덤으로 사용됨.
@@ -49,18 +50,38 @@ public class DeadLockPreventionUsingHoldAndWait extends Thread {
 					}
 				}
 				System.out.println("id " + this.id + " need : " + Arrays.toString(save.keySet().toArray()));
-
+				// 할당
 				while (require < rand) {
-                        acquire(rand);
+					synchronized (usedResource) {
+						AtomicBoolean test = new AtomicBoolean(true);
+						save.forEach((kk, vv) -> {
+							if (usedResource[kk]) {
+								test.set(false);
+							}
+						});
+						if (test.get() == false) {
+							continue;
+						}
+
+						this.save.forEach((k, v) -> {
+							try {
+								usedResource[k] = true;
+								v.acquire();
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+							require++;
+						});
+					}
 				}
 				work(save.keySet());
 				// 작업 후 초기화
-				for (Semaphore s : this.save.values()) {
-					s.release();
-				}
+				save.forEach((k, v)->{
+					v.release();
+					usedResource[k] = false;
+				});
 				this.save = new HashMap<Integer, Semaphore>();
 				require = 0;
-                loopCount--;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -69,30 +90,9 @@ public class DeadLockPreventionUsingHoldAndWait extends Thread {
 	}
 
 	private void work(Set<Integer> need) throws InterruptedException {
-		System.out.println("work : " + this.id + Arrays.toString(need.toArray()));
+		System.out.println("work : " + this.id + " need : " + Arrays.toString(need.toArray()));
 		sleep(this.sleepTime);
 	}
-
-    private void acquire(int rand){
-            List<Semaphore> list = new ArrayList<>();
-            save.forEach((k, v) -> {
-                if(v.tryAcquire()){
-                    //필요한 자원들을 모두 한번에 할당해야함.
-                    //할당 못하면 대기해야됨.
-                    list.add(v);
-                    require++;
-                }else{
-                    //여기서 다 풀어버리면 다른 스레드가 쓰고 있던것도 풀려버림
-                    //어떤 스레드가 어떤 자원을 요구할지 모름
-                    //어떤 스레드가 몇 개의 자원을 요구할지 모름
-                    list.forEach(s-> {
-                        s.release();
-                    });
-                    require = 0;
-                    return;
-                }
-            });
-    }
 
 	public static void main(String[] args) {
 		// 리소스의 개수
@@ -105,16 +105,16 @@ public class DeadLockPreventionUsingHoldAndWait extends Thread {
 		int loop = -1;
 		// work의 sleep 시간
 		int sleepTime = 0;
-
+		DeadLockPreventionUsingHoldAndWait.usedResource = new boolean[numOfResource];
 		List<Semaphore> resource = new ArrayList<>();
 		for (int i = 0; i < numOfResource; i++) {
 			resource.add(new Semaphore(1));
 		}
 
 		long beforeTime = System.currentTimeMillis(); // 시작시간 측정
-		List<DeadLock> saveThread = new ArrayList<DeadLock>();
+		List<DeadLockPreventionUsingHoldAndWait> saveThread = new ArrayList<>();
 		for (int i = 0; i < numOfThread; i++) {
-			DeadLock p = new DeadLock(i, // Thread id
+			DeadLockPreventionUsingHoldAndWait p = new DeadLockPreventionUsingHoldAndWait(i, // Thread id
 					numOfResource, resource, maxResource, sleepTime, loop);
 			p.start();
 			saveThread.add(p);
@@ -124,7 +124,7 @@ public class DeadLockPreventionUsingHoldAndWait extends Thread {
 		while (true) {
 			boolean threadEnd = true;
 			for (int i = 0; i < saveThread.size(); i++) {
-				DeadLock temp = saveThread.get(i);
+				DeadLockPreventionUsingHoldAndWait temp = saveThread.get(i);
 				if (temp.end == false) {
 					threadEnd = false;
 				}
