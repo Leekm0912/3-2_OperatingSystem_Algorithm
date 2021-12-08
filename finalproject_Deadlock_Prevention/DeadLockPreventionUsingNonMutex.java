@@ -3,7 +3,7 @@ package finalproject_Deadlock_Prevention;
 import java.util.*;
 
 
-public class DeadLockNonMutex extends Thread {
+public class DeadLockPreventionUsingNonMutex extends Thread {
 	private int id;
 	private int numOfResource;
 	private int maxResource;
@@ -15,7 +15,7 @@ public class DeadLockNonMutex extends Thread {
 	public boolean end = false;
 	private int sleepTime = 0;
 
-	public DeadLockNonMutex(int id, int numOfResource, List<Integer> resource, int maxResource, int sleepTime) {
+	public DeadLockPreventionUsingNonMutex(int id, int numOfResource, List<Integer> resource, int maxResource, int sleepTime) {
 		this.id = id;
 		this.resource = resource;
 		this.numOfResource = numOfResource;
@@ -23,7 +23,7 @@ public class DeadLockNonMutex extends Thread {
 		this.sleepTime = sleepTime;
 	}
 
-	public DeadLockNonMutex(int id, int numOfResource, List<Integer> resource, int maxResource, int sleepTime,
+	public DeadLockPreventionUsingNonMutex(int id, int numOfResource, List<Integer> resource, int maxResource, int sleepTime,
 			int loopCount) {
 		this(id, numOfResource, resource, maxResource, sleepTime);
 		this.loop = loopCount;
@@ -84,9 +84,9 @@ public class DeadLockNonMutex extends Thread {
 		}
 
 		long beforeTime = System.currentTimeMillis(); // 시작시간 측정
-		List<DeadLockNonMutex> saveThread = new ArrayList<DeadLockNonMutex>();
+		List<DeadLockPreventionUsingNonMutex> saveThread = new ArrayList<>();
 		for (int i = 0; i < numOfThread; i++) {
-			DeadLockNonMutex p = new DeadLockNonMutex(i, // Thread id
+			DeadLockPreventionUsingNonMutex p = new DeadLockPreventionUsingNonMutex(i, // Thread id
 					numOfResource, resource, maxResource, sleepTime, loop);
 			p.start();
 			saveThread.add(p);
@@ -96,7 +96,7 @@ public class DeadLockNonMutex extends Thread {
 		while (true) {
 			boolean threadEnd = true;
 			for (int i = 0; i < saveThread.size(); i++) {
-				DeadLockNonMutex temp = saveThread.get(i);
+				DeadLockPreventionUsingNonMutex temp = saveThread.get(i);
 				if (temp.end == false) {
 					threadEnd = false;
 				}
