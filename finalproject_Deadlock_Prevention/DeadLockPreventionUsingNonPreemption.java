@@ -49,6 +49,7 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 		while (loopCount > 0 || this.loop == -1) {
 			// System.out.println("start "+ id);
 			// 스레드가 몇개의 자원을 필요로 할지. 1 ~ maxResource 사이의 값이 랜덤으로 사용됨.
+			List<Semaphore> getResourceList = new ArrayList<>();
 			int rand = random.nextInt(this.maxResource) + 1;
 			// 고른 자원을 save에 추가
 			while (this.save.size() < rand) {
@@ -64,6 +65,7 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 				while (require < rand) {
 					this.save.forEach((k, v) -> {
 						if (v.tryAcquire()) {
+							getResourceList.add(v);
 							require++;
 						} else {
 							// 잠겨있지 않으면 뺏어옴
@@ -71,13 +73,14 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 								try {
 									v.release();
 									v.acquire();
+									getResourceList.add(v);
 									require++;
 								} catch (Exception e) {
 								}
 							}
 							// 잠겨있으면 확보했던 자원들을 놓고 처음으로 돌아감.
 							else {
-								save.forEach((kk, vv) -> {
+								getResourceList.forEach((vv) -> {
 									vv.release();
 								});
 								require = 0;
