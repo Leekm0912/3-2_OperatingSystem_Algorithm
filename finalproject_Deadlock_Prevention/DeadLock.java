@@ -70,6 +70,7 @@ public class DeadLock extends Thread {
 			}
 		}
 		this.end = true;
+		loopCount--;
 	}
 
 	private void work(Set<Integer> need) throws InterruptedException {

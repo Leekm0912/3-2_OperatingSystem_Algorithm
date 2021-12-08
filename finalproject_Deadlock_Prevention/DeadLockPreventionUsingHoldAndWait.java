@@ -50,19 +50,23 @@ public class DeadLockPreventionUsingHoldAndWait extends Thread {
 					}
 				}
 				System.out.println("id " + this.id + " need : " + Arrays.toString(save.keySet().toArray()));
+
 				// 할당
 				while (require < rand) {
+					//모든 자원을 동시에 할당하기 위해 synchronized를 사용
 					synchronized (usedResource) {
 						AtomicBoolean test = new AtomicBoolean(true);
+						//각 자원을 사용하기 전 자원 사용 여부를 확인해 사용중이면 test를 false로 변경
 						save.forEach((kk, vv) -> {
 							if (usedResource[kk]) {
 								test.set(false);
 							}
 						});
+						//하나라도 사용중인 자원이 있다면 처음으로 돌아감
 						if (test.get() == false) {
 							continue;
 						}
-
+						//자원 사용 여부를 true로 바꾸고 모든 자원 할당
 						this.save.forEach((k, v) -> {
 							try {
 								usedResource[k] = true;
