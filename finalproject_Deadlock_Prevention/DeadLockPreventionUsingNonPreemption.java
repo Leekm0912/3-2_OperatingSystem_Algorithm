@@ -86,10 +86,8 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 								require = 0;
 								return;
 							}
-							// System.out.println(Thread.currentThread() + " " + k + " fail");
 						}
 					});
-					// System.out.println(require);
 				}
 				// 반복문을 빠져나왔으면 필요 자원을 모두 가져온것. 작업 수행하면 됨.
 				work(this.save.keySet());
@@ -99,7 +97,6 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 				}
 				this.save = new HashMap<Integer, Semaphore>();
 				this.require = 0;
-				loopCount--;
 				// System.out.println("초기화 완료 " + id);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -133,9 +130,9 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 		// 스레드가 필요로 하는 최대 리소스 개수
 		int maxResource = 5;
 		// 반복 횟수. -1이면 무한반복
-		int loop = -1;
+		int loop = 100;
 		// work의 sleep 시간
-		int sleepTime = 1000;
+		int sleepTime = 0;
 		
 		List<Semaphore> resource = new ArrayList<>();
 		for (int i = 0; i < numOfResource; i++) {

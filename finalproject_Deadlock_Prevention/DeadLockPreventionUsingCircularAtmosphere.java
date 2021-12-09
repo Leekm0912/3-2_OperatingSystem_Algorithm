@@ -2,6 +2,7 @@ package finalproject_Deadlock_Prevention;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.stream.Collectors;
 
 public class DeadLockPreventionUsingCircularAtmosphere extends Thread {
 	private int id;
@@ -49,23 +50,24 @@ public class DeadLockPreventionUsingCircularAtmosphere extends Thread {
 					}
 				}
 
+				List<Map.Entry<Integer, Semaphore>> entries = save.entrySet().stream()
+					.sorted(Map.Entry.comparingByKey())
+					.collect(Collectors.toList());
+				
+
 				while (require < rand) {
-					save.forEach((k,v) -> {
-						try {
-							v.acquire();
-							require++;
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					});
+					for (Map.Entry<Integer, Semaphore> entry : entries) {
+						entry.getValue().acquire();
+						require++;
+					}
 				}
 				work(save.keySet());
 				// 작업 후 초기화
-				for (Semaphore s : this.save.values()) {
-					s.release();
-				}
+				save.forEach((v,k) -> {
+					k.release();
+				});
 				this.save = new HashMap<Integer, Semaphore>();
+				require = 0;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -93,10 +95,11 @@ public class DeadLockPreventionUsingCircularAtmosphere extends Thread {
 
 		List<Semaphore> resource = new ArrayList<>();
 		for (int i = 0; i < numOfResource; i++) {
-			resource.add(new Semaphore(1));
+			resource.add(new Semaphore(1, true));
 		}
 
 		long beforeTime = System.currentTimeMillis(); // 시작시간 측정
+
 		List<DeadLockPreventionUsingCircularAtmosphere> saveThread = new ArrayList<>();
 		for (int i = 0; i < numOfThread; i++) {
 			DeadLockPreventionUsingCircularAtmosphere p = new DeadLockPreventionUsingCircularAtmosphere(i, // Thread id

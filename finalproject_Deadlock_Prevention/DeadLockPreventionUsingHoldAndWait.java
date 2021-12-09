@@ -107,7 +107,7 @@ public class DeadLockPreventionUsingHoldAndWait extends Thread {
 		// 스레드가 필요로 하는 최대 리소스 개수
 		int maxResource = 5;
 		// 반복 횟수. -1이면 무한반복
-		int loop = -1;
+		int loop = 100;
 		// work의 sleep 시간
 		int sleepTime = 0;
 		DeadLockPreventionUsingHoldAndWait.usedResource = new boolean[numOfResource];
