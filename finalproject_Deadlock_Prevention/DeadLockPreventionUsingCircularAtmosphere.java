@@ -41,15 +41,24 @@ public class DeadLockPreventionUsingCircularAtmosphere extends Thread {
 				// 스레드가 몇개의 자원을 필요로 할지. 1 ~ maxResource 사이의 값이 랜덤으로 사용됨.
 				int rand = random.nextInt(this.maxResource) + 1;
 				System.out.println("id " + this.id + " need : " + rand + "resource");
+				
+				while (save.size() < rand) {
+					int temp = random.nextInt(this.numOfResource);
+					if (!save.containsKey(temp)) {
+						save.put(temp, this.resource.get(temp));
+					}
+				}
 
 				while (require < rand) {
-					for(int i=0; i<this.numOfResource; i++) {
-						Semaphore temp = this.resource.get(i);
-						if(temp.tryAcquire()) {
-							this.save.put(i, temp);
-							this.require++;
+					save.forEach((k,v) -> {
+						try {
+							v.acquire();
+							require++;
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-					}
+					});
 				}
 				work(save.keySet());
 				// 작업 후 초기화
@@ -57,7 +66,6 @@ public class DeadLockPreventionUsingCircularAtmosphere extends Thread {
 					s.release();
 				}
 				this.save = new HashMap<Integer, Semaphore>();
-				require = 0;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
