@@ -68,9 +68,9 @@ public class DeadLock extends Thread {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			loopCount--;
 		}
 		this.end = true;
-		loopCount--;
 	}
 
 	private void work(Set<Integer> need) throws InterruptedException {

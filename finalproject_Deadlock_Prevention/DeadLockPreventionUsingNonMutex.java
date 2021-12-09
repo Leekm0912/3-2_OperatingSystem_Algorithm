@@ -52,7 +52,7 @@ public class DeadLockPreventionUsingNonMutex extends Thread {
 			
 			work(save.keySet());
 			// 작업 후 초기화
-			
+			loopCount--;
 		}
 		this.end = true;
 	}

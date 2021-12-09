@@ -104,6 +104,7 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			loopCount--;
 		}
 		// 스레드의 작업이 끝나면 true로 바꿔 작업이 끝난걸 알려줌.
 		this.end = true;

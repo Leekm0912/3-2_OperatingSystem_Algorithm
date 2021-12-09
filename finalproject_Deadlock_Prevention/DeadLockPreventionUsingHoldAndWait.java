@@ -89,6 +89,7 @@ public class DeadLockPreventionUsingHoldAndWait extends Thread {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			loopCount--;
 		}
 		this.end = true;
 	}
