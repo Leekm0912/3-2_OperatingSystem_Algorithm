@@ -63,8 +63,8 @@ public class DeadLockPreventionUsingCircularAtmosphere extends Thread {
 				}
 				work(save.keySet());
 				// 작업 후 초기화
-				save.forEach((v,k) -> {
-					k.release();
+				save.forEach((key, value) -> {
+					value.release();
 				});
 				this.save = new HashMap<Integer, Semaphore>();
 				require = 0;
