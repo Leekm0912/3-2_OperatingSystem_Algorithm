@@ -74,7 +74,7 @@ public class DeadLockPreventionUsingNonMutex extends Thread {
 		// 스레드가 필요로 하는 최대 리소스 개수
 		int maxResource = 5;
 		// 반복 횟수. -1이면 무한반복
-		int loop = 100;
+		int loop = 10000;
 		// work의 sleep 시간
 		int sleepTime = 0;
 
@@ -92,20 +92,33 @@ public class DeadLockPreventionUsingNonMutex extends Thread {
 			saveThread.add(p);
 		}
 
-		// thread가 끝날때까지 대기.
+		long[] threadEndTime = new long[numOfThread];
+		boolean[] threadEndCheck = new boolean[numOfThread];
 		while (true) {
-			boolean threadEnd = true;
+			boolean allthreadEnd = true;
 			for (int i = 0; i < saveThread.size(); i++) {
 				DeadLockPreventionUsingNonMutex temp = saveThread.get(i);
 				if (temp.end == false) {
-					threadEnd = false;
+					allthreadEnd = false;
+				}else {
+					if(threadEndCheck[i] == false) {
+						long afterTime = System.currentTimeMillis(); // 코드 실행 후의 시간 측정
+						threadEndTime[i] = (afterTime - beforeTime);
+						threadEndCheck[i] = true;
+					}
 				}
 			}
-			if (threadEnd) {
+			if (allthreadEnd) {
 				break;
 			}
 		}
 		long afterTime = System.currentTimeMillis(); // 코드 실행 후의 시간 측정
-		System.err.println(" 소요시간(ms) : " + (afterTime - beforeTime));
+		for(int i = 0; i < numOfThread; i++) {
+			System.err.println(i + "번 스레드 종료시간(ms) : " + threadEndTime[i]);
+		}
+		System.err.println(" 총 소요시간(ms) : " + (afterTime - beforeTime));
+		long max = Arrays.stream(threadEndTime).max().getAsLong();
+		long min = Arrays.stream(threadEndTime).min().getAsLong();
+		System.err.println(" 스레드 별 차이(ms) : " + (max - min));
 	}
 }
