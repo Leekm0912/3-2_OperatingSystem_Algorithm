@@ -93,13 +93,13 @@ public class DeadLockPreventionUsingCircularAtmosphere extends Thread {
 
 	public static void main(String[] args) throws InterruptedException, IOException{
 		// 리소스의 개수
-		int numOfResource = 20;
+		int numOfResource = 100;
 		// 스레드의 개수
-		int numOfThread = 15;
+		int numOfThread = 150;
 		// 스레드가 필요로 하는 최대 리소스 개수
 		int maxResource = 5;
 		// 반복 횟수. -1이면 무한반복
-		int loop = 100;
+		int loop = 50;
 		// work의 sleep 시간
 		int sleepTime = 100;
 
