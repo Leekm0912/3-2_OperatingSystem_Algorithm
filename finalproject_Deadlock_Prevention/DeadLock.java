@@ -4,15 +4,25 @@ import java.util.*;
 import java.util.concurrent.Semaphore;
 
 public class DeadLock extends Thread {
+	// 스레드의 id
 	private int id;
+	// 공유 자원의 개수
 	private int numOfResource;
+	// 스레드가 필요로하는 자원의 최대 개수 (1 ~ maxResource개 랜덤 요구함)
 	private int maxResource;
+	// 스레드가 필요로 하는 자원을 몇개 가져왔는지.
 	private int require = 0;
+	// 랜덤 사용을 위한 외부 객체.
 	private Random random = new Random();
+	// 모든 공유자원을 저장해놓은 리스트.
 	private List<Semaphore> resource;
+	// 자신이 가져온 공유자원을 저장한 리스트
 	private Map<Integer, Semaphore> save = new HashMap<>();
+	// 몇회 반복할 것인지. -1이면 무한반복
 	private int loop = -1;
+	// 스레드의 작업이 끝났는지.
 	public boolean end = false;
+	// work 메서드가 얼마동안 작업(현재는 sleep)을 할지.
 	private int sleepTime = 0;
 
 	public DeadLock(int id, int numOfResource, List<Semaphore> resource, int maxResource, int sleepTime) {
