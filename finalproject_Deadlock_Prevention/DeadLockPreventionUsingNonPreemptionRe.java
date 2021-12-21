@@ -220,9 +220,9 @@ public class DeadLockPreventionUsingNonPreemptionRe extends Thread {
 					}
 				}
 			}
-			// sleep(100);
+			sleep(100);
 			long afterTime = System.currentTimeMillis();
-			// System.out.println("runningWork : "+runningWork + "\ttime : " + (afterTime - beforeTime));
+			System.out.println("runningWork : "+runningWork + "\ttime : " + (afterTime - beforeTime));
 			// 외부 파일로 기록.
 			try {
 				writer.write((afterTime - beforeTime) + "," + runningWork+"\n");
