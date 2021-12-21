@@ -16,18 +16,31 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 public class DeadLockPreventionUsingNonPreemption extends Thread {
-	private int id; // 스레드의 id
-	private int numOfResource; // 공유 자원의 개수
-	private int maxResource; // 스레드가 필요로하는 자원의 최대 개수 (1 ~ maxResource개 랜덤 요구함)
-	private int require = 0; // 스레드가 필요로 하는 자원을 몇개 가져왔는지.
+	// 스레드의 id
+	private int id; 
+	// 공유 자원의 개수
+	private int numOfResource;
+	// 스레드가 필요로하는 자원의 최대 개수 (1 ~ maxResource개 랜덤 요구함)
+	private int maxResource; 
+	// 스레드가 필요로 하는 자원을 몇개 가져왔는지.
+	private int require = 0; 
 	private Random random = new Random();
-	private List<Semaphore> resource; // 모든 공유자원을 저장해놓은 리스트.
-	private Map<Integer, Semaphore> save = new HashMap<>(); // 자신이 가져온 공유자원을 저장한 리스트
-	private boolean[] lock; // 공유 자원이 작업중인지 판단하기 위한 배열.
-	private int loop = -1; // 몇회 반복할 것인지. -1이면 무한반복
-	public boolean end = false; // 스레드의 작업이 끝났는지.
-	private int sleepTime = 0; // work 메서드가 얼마동안 작업(현재는 sleep)을 할지.
-	public int run = 0; // 현재 실행중인 스레드의 개수를 체크하기 위한 필드.
+	// 모든 공유자원을 저장해놓은 리스트.
+	private List<Semaphore> resource; 
+	// 자신이 가져온 공유자원을 저장한 리스트
+	private Map<Integer, Semaphore> save = new HashMap<>();
+	// 공유 자원이 작업중인지 판단하기 위한 배열.
+	private boolean[] lock;
+	// 몇회 반복할 것인지. -1이면 무한반복
+	private int loop = -1; 
+	// 스레드의 작업이 끝났는지.
+	public boolean end = false;
+	// work 메서드가 얼마동안 작업(현재는 sleep)을 할지.
+	private int sleepTime = 0;
+	// 현재 실행중인 스레드의 개수를 체크하기 위한 필드.
+	public int run = 0; 
+	// 현재 실행중인 스레드의 개수를 체크하기 위한 필드.
+	private Map<Integer, Thread> useMap = new HashMap<>();
 
 	public DeadLockPreventionUsingNonPreemption(int id, int numOfResource, List<Semaphore> resource, int maxResource,
 			int sleepTime) {
@@ -73,11 +86,14 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 					this.save.forEach((k, v) -> {
 						if (v.tryAcquire()) {
 							getResourceList.add(v);
+							useMap.put(k, Thread.currentThread());
 							require++;
 						} else {
 							// 잠겨있지 않으면 뺏어옴
 							if (!lock[k]) {
 								try {
+									Thread temp = useMap.remove(k);
+									temp.interrupt();
 									v.release();
 									v.acquire();
 									getResourceList.add(v);
@@ -195,9 +211,9 @@ public class DeadLockPreventionUsingNonPreemption extends Thread {
 					}
 				}
 			}
-			sleep(100);
+			// sleep(100);
 			long afterTime = System.currentTimeMillis();
-			System.out.println("runningWork : "+runningWork + "\ttime : " + (afterTime - beforeTime));
+			// System.out.println("runningWork : "+runningWork + "\ttime : " + (afterTime - beforeTime));
 			// 외부 파일로 기록.
 			try {
 				writer.write((afterTime - beforeTime) + "," + runningWork+"\n");
